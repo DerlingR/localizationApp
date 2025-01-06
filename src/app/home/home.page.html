@@ -1,14 +1,72 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Localization App</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Localizador
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-button expand="full" (click)="getLocation()">Get Current Location</ion-button>
-  <div *ngIf="currentLocation">
-    <p>Latitude: {{ currentLocation.latitude }}</p>
-    <p>Longitude: {{ currentLocation.longitude }}</p>
-  </div>
-</ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Mi Ubicación</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-button expand="block" (click)="getLocation()" [disabled]="isLoading">
+              <ion-icon slot="start" name="location"></ion-icon>
+              Obtener ubicación
+            </ion-button>
+            
+            <div *ngIf="currentLocation" class="ion-margin-top">
+              <p>Latitud: {{currentLocation.latitude}}</p>
+              <p>Longitud: {{currentLocation.longitude}}</p>
+              <ion-button expand="block" (click)="shareLocation()" color="secondary">
+                <ion-icon slot="start" name="share"></ion-icon>
+                Compartir ubicación
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
 
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Lugares Cercanos</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-segment scrollable>
+              <ion-segment-button *ngFor="let type of placeTypes" (click)="searchNearbyPlaces(type.id)">
+                <ion-label>{{type.name}}</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+
+            <ion-list *ngIf="nearbyPlaces.length > 0">
+              <ion-item *ngFor="let place of nearbyPlaces">
+                <ion-label>
+                  <h2>{{place.name}}</h2>
+                  <p>{{place.vicinity}}</p>
+                  <p>Distancia: {{place.distance}} km</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+
+            <ion-text color="medium" *ngIf="!nearbyPlaces.length">
+              <p class="ion-text-center">Selecciona una categoría para ver lugares cercanos</p>
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-loading [isOpen]="isLoading" message="Cargando..."></ion-loading>
+  
+  <ion-toast
+    [isOpen]="!!errorMessage"
+    message="{{errorMessage}}"
+    duration="3000"
+    color="danger">
+  </ion-toast>
+</ion-content>
